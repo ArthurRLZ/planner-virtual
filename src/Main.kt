@@ -6,7 +6,12 @@ import ui.screens.TarefasScreen
 
 fun main() = application {
     val tarefaRepository = TarefaRepositoryEmMemoria()
+    val metaRepository = MetaRepositoryEmMemoria()
+    val lembreteRepository = LembreteRepositoryEmMemoria()
+
     val criarTarefaUseCase = CriarTarefaUseCase(tarefaRepository)
+    val criarMetaUseCase = CriarMetaUseCase(metaRepository)
+    val criarLembreteUseCase = CriarLembreteUseCase(lembreteRepository)
 
     Window(onCloseRequest = ::exitApplication, title = "Planner Virtual") {
         TarefasScreen(criarTarefaUseCase)
