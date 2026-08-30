@@ -46,3 +46,10 @@ enum class Turno {
 enum class DiaSemana {
     SEGUNDA, TERCA, QUARTA, QUINTA, SEXTA, SABADO, DOMINGO
 }
+
+@Serializable
+enum class BlocoTempo(val minutos: Int?) {
+    MEIA_HORA(30),
+    UMA_HORA(60),
+    TURNO(null)
+}

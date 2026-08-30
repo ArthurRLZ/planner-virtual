@@ -10,22 +10,28 @@ import kotlinx.serialization.json.Json
 /**
  * Implementação de [TarefaRepository] que persiste os dados em JSON
  * no localStorage do navegador, sob a chave "planner_tarefas".
- *
- * Os dados sobrevivem ao fechamento da aba e podem ser inspecionados
- * via DevTools → Application → Local Storage.
  */
 class TarefaRepositoryLocalStorage : TarefaRepository {
 
     private val chave = "planner_tarefas"
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json { 
+        ignoreUnknownKeys = true 
+        isLenient = true
+    }
 
     private fun carregar(): MutableList<Tarefa> {
         val conteudo = localStorage.getItem(chave) ?: return mutableListOf()
-        return json.decodeFromString<List<Tarefa>>(conteudo).toMutableList()
+        return try {
+            json.decodeFromString<List<Tarefa>>(conteudo).toMutableList()
+        } catch (e: Throwable) {
+            mutableListOf()
+        }
     }
 
     private fun persistir(lista: List<Tarefa>) {
-        localStorage.setItem(chave, json.encodeToString(lista))
+        try {
+            localStorage.setItem(chave, json.encodeToString(lista))
+        } catch (e: Throwable) {}
     }
 
     override fun salvar(tarefa: Tarefa) {
@@ -41,6 +47,8 @@ class TarefaRepositoryLocalStorage : TarefaRepository {
     override fun buscarTodas(): List<Tarefa> = carregar()
 
     override fun remover(id: String) {
-        persistir(carregar().filter { it.id != id })
+        val lista = carregar()
+        lista.removeAll { it.id == id }
+        persistir(lista)
     }
 }
