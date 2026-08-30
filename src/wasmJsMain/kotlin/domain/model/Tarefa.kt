@@ -21,7 +21,8 @@ data class Tarefa(
     val blocoTempo: BlocoTempo? = null,
     val turno: Turno? = null,
     val status: StatusTarefa = StatusTarefa.PENDENTE,
-    val prioridade: Prioridade = Prioridade.MEDIA
+    val prioridade: Prioridade = Prioridade.MEDIA,
+    val linkExterno: String? = null
 ) {
     init {
         require(descricao.isNotBlank()) {
