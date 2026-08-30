@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import br.edu.ufapetro.planner.domain.usecase.painel.GerarResumoDoDiaUseCase
 import br.edu.ufapetro.planner.ui.screens.PainelScreen
+import ui.screens.LembretesScreen
 import data.repository.LembreteRepositoryLocalStorage
 import data.repository.MetaRepositoryLocalStorage
 import data.repository.TarefaRepositoryLocalStorage
@@ -38,7 +39,6 @@ fun App() {
     val criarMetaUseCase = remember { CriarMetaUseCase(metaRepository) }
     val listarMetasUseCase = remember { ListarMetasUseCase(metaRepository) }
     val atualizarStatusMetaUseCase = remember { AtualizarStatusMetaUseCase(metaRepository) }
-    @Suppress("UNUSED_VARIABLE")
     val criarLembreteUseCase = remember { CriarLembreteUseCase(lembreteRepository) }
 
     // Novo UseCase para o Painel
@@ -59,6 +59,7 @@ fun App() {
                 Button(onClick = { telaAtual = "painel" }) { Text("Painel") }
                 Button(onClick = { telaAtual = "metas" }) { Text("Metas") }
                 Button(onClick = { telaAtual = "tarefas" }) { Text("Tarefas") }
+                Button(onClick = { telaAtual = "lembretes" }) { Text("Lembretes") }
             }
 
             when (telaAtual) {
@@ -68,6 +69,7 @@ fun App() {
                 )
                 "metas" -> MetasScreen(criarMetaUseCase, listarMetasUseCase, atualizarStatusMetaUseCase)
                 "tarefas" -> TarefasScreen(criarTarefaUseCase)
+                "lembretes" -> LembretesScreen(criarLembreteUseCase)
             }
         }
     }
