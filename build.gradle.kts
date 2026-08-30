@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     kotlin("multiplatform") version "2.1.20"
     id("org.jetbrains.compose") version "1.7.3"
@@ -14,9 +16,10 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
+@OptIn(ExperimentalWasmDsl::class)
 kotlin {
     wasmJs {
-        moduleName = "plannerVirtual"
+        outputModuleName.set("plannerVirtual")
         browser {
             commonWebpackConfig {
                 outputFileName = "plannerVirtual.js"
