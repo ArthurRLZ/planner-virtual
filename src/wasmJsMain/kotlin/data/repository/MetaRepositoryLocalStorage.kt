@@ -14,15 +14,24 @@ import kotlinx.serialization.json.Json
 class MetaRepositoryLocalStorage : MetaRepository {
 
     private val chave = "planner_metas"
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json { 
+        ignoreUnknownKeys = true 
+        isLenient = true
+    }
 
     private fun carregar(): MutableList<Meta> {
         val conteudo = localStorage.getItem(chave) ?: return mutableListOf()
-        return json.decodeFromString<List<Meta>>(conteudo).toMutableList()
+        return try {
+            json.decodeFromString<List<Meta>>(conteudo).toMutableList()
+        } catch (e: Throwable) {
+            mutableListOf()
+        }
     }
 
     private fun persistir(lista: List<Meta>) {
-        localStorage.setItem(chave, json.encodeToString(lista))
+        try {
+            localStorage.setItem(chave, json.encodeToString(lista))
+        } catch (e: Throwable) {}
     }
 
     override fun salvar(meta: Meta) {
@@ -38,6 +47,8 @@ class MetaRepositoryLocalStorage : MetaRepository {
     override fun buscarTodas(): List<Meta> = carregar()
 
     override fun remover(id: String) {
-        persistir(carregar().filter { it.id != id })
+        val lista = carregar()
+        lista.removeAll { it.id == id }
+        persistir(lista)
     }
 }
