@@ -31,6 +31,7 @@ fun PainelScreen(
     var diaSelecionado by remember { mutableStateOf(hoje) }
     var resumo by remember { mutableStateOf<ResumoDoDia?>(null) }
     var atividadesDoMes by remember { mutableStateOf<Map<LocalDate, AtividadesDoDia>>(emptyMap()) }
+    var mostrarModalDia by remember { mutableStateOf(false) }
 
     LaunchedEffect(mesExibido) {
         atividadesDoMes = listarAtividadesDoMesUseCase(mesExibido.year, mesExibido.monthNumber)
@@ -55,25 +56,11 @@ fun PainelScreen(
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "Acompanhe seu mês e veja o resumo de qualquer dia.",
+                "Veja o resumo do dia e acompanhe seu mês.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-
-        item {
-            CalendarioMensal(
-                mesExibido = mesExibido,
-                atividades = atividadesDoMes,
-                diaSelecionado = diaSelecionado,
-                hoje = hoje,
-                onMesAnterior = { mesExibido = mesExibido.minus(1, DateTimeUnit.MONTH) },
-                onMesProximo = { mesExibido = mesExibido.plus(1, DateTimeUnit.MONTH) },
-                onDiaSelecionado = { diaSelecionado = it }
-            )
-        }
-
-        item { LegendaCalendario() }
 
         item {
             resumo?.let { r ->
@@ -84,7 +71,56 @@ fun PainelScreen(
             ) { CircularProgressIndicator() }
         }
 
+        item {
+            CalendarioMensal(
+                mesExibido = mesExibido,
+                atividades = atividadesDoMes,
+                diaSelecionado = diaSelecionado,
+                hoje = hoje,
+                onMesAnterior = { mesExibido = mesExibido.minus(1, DateTimeUnit.MONTH) },
+                onMesProximo = { mesExibido = mesExibido.plus(1, DateTimeUnit.MONTH) },
+                onDiaSelecionado = { 
+                    diaSelecionado = it
+                    mostrarModalDia = true
+                }
+            )
+        }
+
+        item { LegendaCalendario() }
+
         item { RelatorioMensalPlaceholder(mesExibido) }
+    }
+
+    if (mostrarModalDia && resumo != null) {
+        AlertDialog(
+            onDismissRequest = { mostrarModalDia = false },
+            confirmButton = {
+                TextButton(onClick = { mostrarModalDia = false }) { Text("Fechar") }
+            },
+            title = {
+                Text("Detalhes de ${formatarDataCompleta(diaSelecionado)}", fontWeight = FontWeight.Bold)
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (resumo!!.tarefasPendentes.isNotEmpty()) {
+                        Text("Tarefas Pendentes:", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+                        resumo!!.tarefasPendentes.forEach { Text("• ${it.descricao}", style = MaterialTheme.typography.bodySmall) }
+                    }
+                    if (resumo!!.metasEmAndamento.isNotEmpty()) {
+                        Text("Metas em Andamento:", fontWeight = FontWeight.SemiBold, color = Color(0xFF7C3AED))
+                        resumo!!.metasEmAndamento.forEach { Text("• ${it.descricao}", style = MaterialTheme.typography.bodySmall) }
+                    }
+                    if (resumo!!.proximosLembretes.isNotEmpty()) {
+                        Text("Lembretes:", fontWeight = FontWeight.SemiBold, color = Color(0xFFD97706))
+                        resumo!!.proximosLembretes.forEach { Text("• ${it.descricao}", style = MaterialTheme.typography.bodySmall) }
+                    }
+                    
+                    if (resumo!!.tarefasPendentes.isEmpty() && resumo!!.metasEmAndamento.isEmpty() && resumo!!.proximosLembretes.isEmpty()) {
+                        Text("Nenhuma atividade pendente para este dia.", style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+            }
+        )
     }
 }
 
@@ -137,7 +173,7 @@ fun CalendarioMensal(
             }
 
             // Cabeçalho dos dias da semana
-            Row(Modifier.fillMaxWidth()) {
+            Row(Modifier.fillMaxWidth().padding(bottom = 4.dp)) {
                 listOf(
                     DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY,
                     DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY
@@ -146,12 +182,14 @@ fun CalendarioMensal(
                         diaSemanaAbreviado(dia),
                         modifier = Modifier.weight(1f),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold
                     )
                 }
             }
+            
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
 
             // Grid de dias
             val primeiroDiaMes = LocalDate(mesExibido.year, mesExibido.monthNumber, 1)
@@ -201,46 +239,37 @@ fun CelulaDia(
 ) {
     val temAtividade = atividades?.temAlgumaAtividade == true
 
-    Box(
-        modifier = modifier.padding(3.dp).aspectRatio(1f),
-        contentAlignment = Alignment.Center
+    Surface(
+        onClick = onClick,
+        color = if (isSelecionado && !isHoje) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) else Color.Transparent,
+        shape = RoundedCornerShape(8.dp),
+        modifier = modifier.padding(2.dp).height(72.dp)
     ) {
-        Surface(
-            onClick = onClick,
-            shape = RoundedCornerShape(10.dp),
-            color = when {
-                isHoje -> MaterialTheme.colorScheme.primary
-                isSelecionado -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-                else -> Color.Transparent
-            },
-            border = BorderStroke(
-                width = if (temAtividade || isSelecionado) 1.5.dp else 1.dp,
-                color = when {
-                    isSelecionado && !isHoje -> MaterialTheme.colorScheme.primary
-                    temAtividade -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                    else -> MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f)
-                }
-            ),
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier.fillMaxSize().padding(top = 6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            Column(
-                Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape)
+                    .background(if (isHoje) MaterialTheme.colorScheme.primary else Color.Transparent),
+                contentAlignment = Alignment.Center
             ) {
                 Text(
-                    dia.dayOfMonth.toString(),
+                    text = dia.dayOfMonth.toString(),
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = if (isHoje || isSelecionado) FontWeight.Bold else FontWeight.Normal,
+                    fontWeight = if (isHoje || isSelecionado) FontWeight.Bold else FontWeight.Medium,
                     color = if (isHoje) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
                 )
-                if (temAtividade) {
-                    Spacer(Modifier.height(2.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                        if (atividades!!.temTarefa) PontoAtividade(MaterialTheme.colorScheme.primary, isHoje)
-                        if (atividades.temMeta) PontoAtividade(Color(0xFF7C3AED), isHoje)
-                        if (atividades.temLembrete) PontoAtividade(Color(0xFFD97706), isHoje)
-                    }
+            }
+            if (temAtividade) {
+                Spacer(Modifier.height(4.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                    if (atividades!!.temTarefa) PontoAtividade(MaterialTheme.colorScheme.primary)
+                    if (atividades.temMeta) PontoAtividade(Color(0xFF7C3AED))
+                    if (atividades.temLembrete) PontoAtividade(Color(0xFFD97706))
                 }
             }
         }
@@ -248,13 +277,8 @@ fun CelulaDia(
 }
 
 @Composable
-fun PontoAtividade(cor: Color, isHoje: Boolean) {
-    Box(
-        Modifier
-            .size(4.dp)
-            .clip(CircleShape)
-            .background(if (isHoje) Color.White else cor)
-    )
+fun PontoAtividade(cor: Color) {
+    Box(Modifier.size(5.dp).clip(CircleShape).background(cor))
 }
 
 @Composable
@@ -290,7 +314,7 @@ fun ResumoDoDiaCard(dia: LocalDate, resumo: ResumoDoDia) {
     ) {
         Column(
             Modifier.fillMaxWidth().padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
                 "Resumo de ${formatarDataCompleta(dia)}",
@@ -298,37 +322,91 @@ fun ResumoDoDiaCard(dia: LocalDate, resumo: ResumoDoDia) {
                 fontWeight = FontWeight.Bold
             )
 
-            LinearProgressIndicator(
-                progress = { resumo.indicadorProdutividade },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Text(
-                "Produtividade: ${(resumo.indicadorProdutividade * 100).toInt()}%",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            // Indicador Geral de Produtividade
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Produtividade Geral",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        "${(resumo.indicadorProdutividade * 100).toInt()}%",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                LinearProgressIndicator(
+                    progress = { resumo.indicadorProdutividade },
+                    modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
 
-            IndicadorResumo("Tarefas pendentes", resumo.tarefasPendentes.size, MaterialTheme.colorScheme.primary)
-            IndicadorResumo("Tarefas concluídas", resumo.tarefasConcluidas.size, Color(0xFF166534))
-            IndicadorResumo("Metas em andamento", resumo.metasEmAndamento.size, Color(0xFF7C3AED))
-            IndicadorResumo("Metas cumpridas", resumo.metasCumpridas.size, Color(0xFF166534))
-            IndicadorResumo("Próximos lembretes", resumo.proximosLembretes.size, Color(0xFFD97706))
+            Spacer(Modifier.height(4.dp))
+
+            // Grid para os outros 4 itens
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    MétricaCard(
+                        "Tarefas Pendentes", 
+                        resumo.tarefasPendentes.size, 
+                        MaterialTheme.colorScheme.primary
+                    )
+                    MétricaCard(
+                        "Metas em Andamento", 
+                        resumo.metasEmAndamento.size, 
+                        Color(0xFF7C3AED)
+                    )
+                }
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    MétricaCard(
+                        "Tarefas Concluídas", 
+                        resumo.tarefasConcluidas.size, 
+                        Color(0xFF166534)
+                    )
+                    MétricaCard(
+                        "Próximos Lembretes", 
+                        resumo.proximosLembretes.size, 
+                        Color(0xFFD97706)
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-fun IndicadorResumo(rotulo: String, quantidade: Int, cor: Color) {
-    Row(
-        Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+fun MétricaCard(rotulo: String, quantidade: Int, cor: Color) {
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Box(Modifier.size(8.dp).clip(CircleShape).background(cor))
-            Text(rotulo, style = MaterialTheme.typography.bodyMedium)
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Box(Modifier.size(8.dp).clip(CircleShape).background(cor))
+                Text(
+                    quantidade.toString(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Text(
+                rotulo,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
-        Text(quantidade.toString(), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium)
     }
 }
 
