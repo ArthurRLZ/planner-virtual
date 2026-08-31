@@ -16,6 +16,8 @@ import data.repository.LembreteRepositoryLocalStorage
 import data.repository.MetaRepositoryLocalStorage
 import data.repository.TarefaRepositoryLocalStorage
 import domain.usecase.lembrete.CriarLembreteUseCase
+import domain.usecase.lembrete.ListarLembretesUseCase
+import domain.usecase.lembrete.RemoverLembreteUseCase
 import domain.usecase.meta.AtualizarStatusMetaUseCase
 import domain.usecase.meta.CriarMetaUseCase
 import domain.usecase.meta.ListarMetasUseCase
@@ -59,6 +61,8 @@ fun App() {
     val removerMetaUseCase = remember { RemoverMetaUseCase(metaRepository) }
 
     val criarLembreteUseCase = remember { CriarLembreteUseCase(lembreteRepository) }
+    val listarLembretesUseCase = remember { ListarLembretesUseCase(lembreteRepository) }
+    val removerLembreteUseCase = remember { RemoverLembreteUseCase(lembreteRepository) }
 
     val gerarResumoDoDiaUseCase = remember {
         GerarResumoDoDiaUseCase(tarefaRepository, metaRepository, lembreteRepository)
@@ -131,7 +135,9 @@ fun App() {
                             atualizarStatusTarefaUseCase,
                             removerTarefaUseCase
                         )
-                        Tela.LEMBRETES -> LembretesScreen(criarLembreteUseCase)
+                        Tela.LEMBRETES -> LembretesScreen(
+                            criarLembreteUseCase, listarLembretesUseCase, removerLembreteUseCase
+                        )
                         Tela.CLASSROOM -> ClassroomScreen(sincronizarClassroomUseCase)
                         Tela.RELATORIOS -> RelatoriosScreen(
                             gerarRelatorioSemanalUseCase, gerarRelatorioMensalUseCase, gerarRelatorioAnualUseCase
