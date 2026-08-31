@@ -119,6 +119,10 @@ http://localhost:8080/
 
 ## 👥 Integrantes do Grupo
 
-- **João Vitor** - [GitHub](https://github.com/Joaovitorrr07)
-- *(Preencha com os demais integrantes do grupo)*
-
+- **Arthur Passos** - [@ArthurRLZ](https://github.com/ArthurRLZ)
+- **Augusto Jorge** - [@AugustoJBM](https://github.com/AugustoJBM)
+- **Euclides Laurindo** - [@euclideslaurindo](https://github.com/euclideslaurindo)
+- **Heitor Calado** - [@HeitorCalado](https://github.com/HeitorCalado)
+- **Joaci Laurindo** - [@joacif](https://github.com/joacif)
+- **João Vitor** - [@Joaovitorrr07](https://github.com/Joaovitorrr07)
+- **Luís Arthur** - [@lu1s-4rthur](https://github.com/lu1s-4rthur)
