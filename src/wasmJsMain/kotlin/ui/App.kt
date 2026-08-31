@@ -24,14 +24,16 @@ import domain.usecase.tarefa.AtualizarStatusTarefaUseCase
 import domain.usecase.tarefa.CriarTarefaUseCase
 import domain.usecase.tarefa.ListarTarefasPorDataUseCase
 import domain.usecase.tarefa.RemoverTarefaUseCase
+import domain.usecase.classroom.SincronizarClassroomUseCase
 import kotlinx.coroutines.launch
 import ui.screens.LembretesScreen
 import ui.screens.MetasScreen
 import ui.screens.PainelScreen
 import ui.screens.TarefasScreen
+import ui.screens.ClassroomScreen
 
 enum class Tela(val rotulo: String) {
-    PAINEL("Painel"), TAREFAS("Tarefas"), METAS("Metas"), LEMBRETES("Lembretes")
+    PAINEL("Painel"), TAREFAS("Tarefas"), METAS("Metas"), LEMBRETES("Lembretes"), CLASSROOM("Classroom")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,6 +61,8 @@ fun App() {
     val listarAtividadesDoMesUseCase = remember {
         ListarAtividadesDoMesUseCase(tarefaRepository, metaRepository, lembreteRepository)
     }
+
+    val sincronizarClassroomUseCase = remember { SincronizarClassroomUseCase(tarefaRepository) }
 
     MaterialTheme {
         var telaAtual by remember { mutableStateOf(Tela.PAINEL) }
@@ -117,6 +121,7 @@ fun App() {
                             removerTarefaUseCase
                         )
                         Tela.LEMBRETES -> LembretesScreen(criarLembreteUseCase)
+                        Tela.CLASSROOM -> ClassroomScreen(sincronizarClassroomUseCase)
                     }
                 }
             }
