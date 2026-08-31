@@ -14,6 +14,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import planner.domain.model.AtividadesDoDia
 import br.edu.ufapetro.planner.domain.model.ResumoDoDia
 import br.edu.ufapetro.planner.domain.usecase.painel.GerarResumoDoDiaUseCase
@@ -161,12 +166,22 @@ fun CalendarioMensal(
                         onClick = onMesAnterior,
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
                         shape = RoundedCornerShape(8.dp)
-                    ) { Text("◀") }
+                    ) {
+                        ChevronLeftIcon(
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
                     FilledTonalButton(
                         onClick = onMesProximo,
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
                         shape = RoundedCornerShape(8.dp)
-                    ) { Text("▶") }
+                    ) {
+                        ChevronRightIcon(
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
                 }
             }
 
@@ -405,5 +420,39 @@ fun MétricaCard(rotulo: String, quantidade: Int, cor: Color) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+@Composable
+fun ChevronLeftIcon(color: Color, modifier: Modifier = Modifier) {
+    Canvas(modifier = modifier) {
+        val strokeWidth = 2.dp.toPx()
+        val path = Path().apply {
+            moveTo(size.width * 0.65f, size.height * 0.18f)
+            lineTo(size.width * 0.35f, size.height * 0.5f)
+            lineTo(size.width * 0.65f, size.height * 0.82f)
+        }
+        drawPath(
+            path = path,
+            color = color,
+            style = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        )
+    }
+}
+
+@Composable
+fun ChevronRightIcon(color: Color, modifier: Modifier = Modifier) {
+    Canvas(modifier = modifier) {
+        val strokeWidth = 2.dp.toPx()
+        val path = Path().apply {
+            moveTo(size.width * 0.35f, size.height * 0.18f)
+            lineTo(size.width * 0.7f, size.height * 0.5f)
+            lineTo(size.width * 0.35f, size.height * 0.82f)
+        }
+        drawPath(
+            path = path,
+            color = color,
+            style = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        )
     }
 }
