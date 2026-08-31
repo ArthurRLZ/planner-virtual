@@ -87,8 +87,6 @@ fun PainelScreen(
         }
 
         item { LegendaCalendario() }
-
-        item { RelatorioMensalPlaceholder(mesExibido) }
     }
 
     if (mostrarModalDia && resumo != null) {
@@ -404,39 +402,6 @@ fun MétricaCard(rotulo: String, quantidade: Int, cor: Color) {
             Text(
                 rotulo,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-// ============================================================================
-// RELATÓRIO MENSAL (placeholder — Issue #12/#13)
-// ============================================================================
-
-@Composable
-fun RelatorioMensalPlaceholder(mesExibido: LocalDate) {
-    OutlinedCard(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.outlinedCardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f)
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
-    ) {
-        Column(
-            Modifier.fillMaxWidth().padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Text(
-                "Relatório de ${mesCompleto(mesExibido.monthNumber)}",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                "🚧 Em construção",
-                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

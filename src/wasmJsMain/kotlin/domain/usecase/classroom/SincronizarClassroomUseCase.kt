@@ -2,10 +2,8 @@ package domain.usecase.classroom
 
 import domain.model.*
 import domain.repository.TarefaRepository
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalTime
+import kotlinx.datetime.*
 import kotlinx.serialization.json.Json
-import util.novoId
 
 class SincronizarClassroomUseCase(
     private val tarefaRepository: TarefaRepository
@@ -17,20 +15,31 @@ class SincronizarClassroomUseCase(
 
     fun processarESalvarTarefas(jsonCourseWork: String) {
         val itens = json.decodeFromString<ClassroomCourseWorkResponse>(jsonCourseWork).courseWork
+        val fusoLocal = TimeZone.currentSystemDefault()
 
         itens.forEach { item ->
-            val data = item.dueDate?.let { LocalDate(it.year, it.month, it.day) }
-                ?: return@forEach // sem data de entrega: pula por enquanto
+            val dataUtc = item.dueDate ?: return@forEach
 
-            val hora = item.dueTime?.let { LocalTime(it.hours, it.minutes) } ?: LocalTime(23, 59)
+            val horaUtc = item.dueTime ?: ClassroomTimeDto(hours = 23, minutes = 59)
+
+            // Monta o instante em UTC e converte pro fuso local
+            val dataHoraUtc = LocalDateTime(
+                year = dataUtc.year,
+                monthNumber = dataUtc.month,
+                dayOfMonth = dataUtc.day,
+                hour = horaUtc.hours,
+                minute = horaUtc.minutes
+            ).toInstant(TimeZone.UTC)
+
+            val dataHoraLocal = dataHoraUtc.toLocalDateTime(fusoLocal)
 
             tarefaRepository.salvar(
                 Tarefa(
                     id = "classroom-${item.id}",
                     descricao = item.title,
                     categoria = Categoria.FACULDADE,
-                    data = data,
-                    horarioInicio = hora,
+                    data = dataHoraLocal.date,
+                    horarioInicio = LocalTime(dataHoraLocal.hour, dataHoraLocal.minute),
                     duracaoMinutos = BlocoTempo.MEIA_HORA.minutos,
                     blocoTempo = BlocoTempo.MEIA_HORA,
                     turno = null,
