@@ -37,6 +37,7 @@ import domain.usecase.meta.ListarMetasUseCase
 import domain.usecase.meta.RemoverMetaUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import ui.theme.corVisual
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
@@ -1296,15 +1297,6 @@ fun TrashIcon(color: Color, modifier: Modifier = Modifier) {
 // ============================================================================
 // 8. FORMATAÇÃO VISUAL, CORES E UTILITÁRIOS
 // ============================================================================
-
-fun Categoria.corVisual(): Color = when (this) {
-    Categoria.FACULDADE -> Color(0xFF2563EB)         // Royal Blue
-    Categoria.TRABALHO -> Color(0xFFD97706)          // Warm Amber
-    Categoria.SAUDE -> Color(0xFF059669)             // Emerald Green
-    Categoria.LAZER -> Color(0xFF9333EA)             // Fuchsia / Purple
-    Categoria.PROJETOS_PESSOAIS -> Color(0xFF0D9488) // Cyan / Teal
-    Categoria.ESTUDOS -> Color(0xFF4F46E5)           // Indigo
-}
 
 fun Categoria.nomeAmigavel(): String = when (this) {
     Categoria.FACULDADE -> "Faculdade"

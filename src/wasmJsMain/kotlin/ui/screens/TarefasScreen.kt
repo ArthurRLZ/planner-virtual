@@ -38,6 +38,7 @@ import domain.usecase.tarefa.RemoverTarefaUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
+import ui.theme.corVisual
 import util.hoje
 import util.novoId
 
