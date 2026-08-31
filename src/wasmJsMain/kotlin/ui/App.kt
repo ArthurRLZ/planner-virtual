@@ -233,9 +233,38 @@ fun IconeTarefas(color: Color, modifier: Modifier = Modifier.size(20.dp)) {
         val w = size.width
         val h = size.height
         val stroke = 1.8.dp.toPx()
-        drawRoundRect(color = color, topLeft = Offset(w * 0.1f, h * 0.15f), size = Size(w * 0.8f, h * 0.8f), style = Stroke(stroke))
-        drawLine(color = color, start = Offset(w * 0.25f, h * 0.4f), end = Offset(w * 0.4f, h * 0.55f), strokeWidth = stroke, cap = StrokeCap.Round)
-        drawLine(color = color, start = Offset(w * 0.4f, h * 0.55f), end = Offset(w * 0.75f, h * 0.3f), strokeWidth = stroke, cap = StrokeCap.Round)
+
+        // Desenho da Prancheta (Retângulo Externo)
+        drawRoundRect(
+            color = color,
+            topLeft = Offset(w * 0.1f, h * 0.15f),
+            size = Size(w * 0.8f, h * 0.75f),
+            style = Stroke(stroke)
+        )
+
+        // Suporte superior da prancheta (Clip)
+        drawRoundRect(
+            color = color,
+            topLeft = Offset(w * 0.35f, h * 0.08f),
+            size = Size(w * 0.3f, h * 0.12f),
+            style = Stroke(stroke)
+        )
+
+        // Checkmark perfeitamente centralizado no interior da prancheta
+        drawLine(
+            color = color,
+            start = Offset(w * 0.30f, h * 0.52f),
+            end = Offset(w * 0.44f, h * 0.66f),
+            strokeWidth = stroke,
+            cap = StrokeCap.Round
+        )
+        drawLine(
+            color = color,
+            start = Offset(w * 0.44f, h * 0.66f),
+            end = Offset(w * 0.70f, h * 0.40f),
+            strokeWidth = stroke,
+            cap = StrokeCap.Round
+        )
     }
 }
 

@@ -110,7 +110,7 @@ fun PainelScreen(
                         resumo!!.tarefasPendentes.forEach { Text("• ${it.descricao}", style = MaterialTheme.typography.bodySmall) }
                     }
                     if (resumo!!.metasEmAndamento.isNotEmpty()) {
-                        Text("Metas em Andamento:", fontWeight = FontWeight.SemiBold, color = Color(0xFF7C3AED))
+                        Text("Metas em Andamento:", fontWeight = FontWeight.SemiBold, color = Color(0xFFEF4444))
                         resumo!!.metasEmAndamento.forEach { Text("• ${it.descricao}", style = MaterialTheme.typography.bodySmall) }
                     }
                     if (resumo!!.proximosLembretes.isNotEmpty()) {
@@ -281,7 +281,7 @@ fun CelulaDia(
                 Spacer(Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                     if (atividades!!.temTarefa) PontoAtividade(MaterialTheme.colorScheme.primary)
-                    if (atividades.temMeta) PontoAtividade(Color(0xFF7C3AED))
+                    if (atividades.temMeta) PontoAtividade(Color(0xFFEF4444))
                     if (atividades.temLembrete) PontoAtividade(Color(0xFFD97706))
                 }
             }
@@ -301,7 +301,7 @@ fun LegendaCalendario() {
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         ItemLegenda("Tarefa", MaterialTheme.colorScheme.primary)
-        ItemLegenda("Meta", Color(0xFF7C3AED))
+        ItemLegenda("Meta", Color(0xFFEF4444))
         ItemLegenda("Lembrete", Color(0xFFD97706))
     }
 }
@@ -374,7 +374,7 @@ fun ResumoDoDiaCard(dia: LocalDate, resumo: ResumoDoDia) {
                     MétricaCard(
                         "Metas em Andamento", 
                         resumo.metasEmAndamento.size, 
-                        Color(0xFF7C3AED)
+                        Color(0xFFEF4444)
                     )
                 }
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
