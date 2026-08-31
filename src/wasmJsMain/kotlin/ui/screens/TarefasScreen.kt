@@ -374,7 +374,16 @@ fun SeletorDeData(
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("◀ Ontem")
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            ChevronLeftIcon(
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.size(10.dp)
+                            )
+                            Text("Ontem")
+                        }
                     }
 
                     FilledTonalButton(
@@ -390,7 +399,16 @@ fun SeletorDeData(
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("Amanhã ▶")
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text("Amanhã")
+                            ChevronRightIcon(
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.size(10.dp)
+                            )
+                        }
                     }
                 }
             }
