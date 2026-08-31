@@ -25,6 +25,10 @@ import domain.usecase.tarefa.CriarTarefaUseCase
 import domain.usecase.tarefa.ListarTarefasPorDataUseCase
 import domain.usecase.tarefa.RemoverTarefaUseCase
 import domain.usecase.classroom.SincronizarClassroomUseCase
+import domain.usecase.relatorio.GerarRelatorioAnualUseCase
+import domain.usecase.relatorio.GerarRelatorioMensalUseCase
+import domain.usecase.relatorio.GerarRelatorioSemanalUseCase
+import ui.screens.RelatoriosScreen
 import kotlinx.coroutines.launch
 import ui.screens.LembretesScreen
 import ui.screens.MetasScreen
@@ -33,7 +37,8 @@ import ui.screens.TarefasScreen
 import ui.screens.ClassroomScreen
 
 enum class Tela(val rotulo: String) {
-    PAINEL("Painel"), TAREFAS("Tarefas"), METAS("Metas"), LEMBRETES("Lembretes"), CLASSROOM("Classroom")
+    PAINEL("Painel"), TAREFAS("Tarefas"), METAS("Metas"), LEMBRETES("Lembretes"),
+    CLASSROOM("Classroom"), RELATORIOS("Relatórios")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,6 +68,12 @@ fun App() {
     }
 
     val sincronizarClassroomUseCase = remember { SincronizarClassroomUseCase(tarefaRepository) }
+
+    val gerarRelatorioSemanalUseCase = remember { GerarRelatorioSemanalUseCase(tarefaRepository, metaRepository) }
+
+    val gerarRelatorioMensalUseCase = remember { GerarRelatorioMensalUseCase(tarefaRepository, metaRepository) }
+
+    val gerarRelatorioAnualUseCase = remember { GerarRelatorioAnualUseCase(tarefaRepository, metaRepository) }
 
     MaterialTheme {
         var telaAtual by remember { mutableStateOf(Tela.PAINEL) }
@@ -122,6 +133,9 @@ fun App() {
                         )
                         Tela.LEMBRETES -> LembretesScreen(criarLembreteUseCase)
                         Tela.CLASSROOM -> ClassroomScreen(sincronizarClassroomUseCase)
+                        Tela.RELATORIOS -> RelatoriosScreen(
+                            gerarRelatorioSemanalUseCase, gerarRelatorioMensalUseCase, gerarRelatorioAnualUseCase
+                        )
                     }
                 }
             }
