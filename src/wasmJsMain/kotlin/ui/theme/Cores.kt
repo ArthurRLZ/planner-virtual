@@ -9,7 +9,7 @@ import domain.model.Categoria
 
 // Palette do Tema Claro
 val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF2563EB),
+    primary = Color(0xFF7C3AED),
     onPrimary = Color.White,
     secondary = Color(0xFF0D9488),
     background = Color(0xFFF8FAFC),
