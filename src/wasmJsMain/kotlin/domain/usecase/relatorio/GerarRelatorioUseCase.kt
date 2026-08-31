@@ -10,7 +10,10 @@ import domain.model.Tarefa
 import domain.model.Turno
 import domain.repository.MetaRepository
 import domain.repository.TarefaRepository
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.minus
+import kotlinx.datetime.number
 
 internal class GerarRelatorioUseCase(
     private val tarefaRepository: TarefaRepository,
@@ -45,40 +48,20 @@ internal class GerarRelatorioUseCase(
 
         val grupo = groupBy {
             if (agruparPorMes) LocalDate(it.data.year, it.data.month, 1) else it.data
-        }.maxBy { it.value.size }
+        }.maxByOrNull { it.value.size } ?: return null
+
         val inicio = grupo.key
         val fim = if (agruparPorMes) {
-            val proximoMes = if (inicio.month == 12) {
+            val proximoMes = if (inicio.month.number == 12) {
                 LocalDate(inicio.year + 1, 1, 1)
             } else {
-                LocalDate(inicio.year, inicio.month + 1, 1)
+                LocalDate(inicio.year, inicio.month.number + 1, 1)
             }
-            proximoMes.minusUmDia()
+            proximoMes.minus(1, DateTimeUnit.DAY)
         } else {
             inicio
         }
         return PeriodoProdutivo(inicio, fim, grupo.value.size)
-    }
-
-    private fun LocalDate.minusUmDia(): LocalDate {
-        val diasNoMes = when (month) {
-            1, 3, 5, 7, 8, 10, 12 -> 31
-            4, 6, 9, 11 -> 30
-            2 -> if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) 29 else 28
-            else -> error("Mês inválido")
-        }
-        return if (dayOfMonth > 1) {
-            LocalDate(year, month, dayOfMonth - 1)
-        } else if (month > 1) {
-            LocalDate(year, month - 1, when (month - 1) {
-                1, 3, 5, 7, 8, 10, 12 -> 31
-                4, 6, 9, 11 -> 30
-                2 -> if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) 29 else 28
-                else -> diasNoMes
-            })
-        } else {
-            LocalDate(year - 1, 12, 31)
-        }
     }
 
     private fun List<Tarefa>.turnoMaisProdutivo(): Turno? =
